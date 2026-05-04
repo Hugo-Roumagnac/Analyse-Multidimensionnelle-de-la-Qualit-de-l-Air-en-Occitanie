@@ -1,0 +1,19 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Environnement virtuel ---
+venv/
+env/
+ENV/
+
+# --- Variables secrètes ---
+.env
+
+# --- Configuration d'IDE ---
+.vscode/
+.idea/
+
+# --- Spécifique Mac (vu ton terminal) ---
+.DS_Store

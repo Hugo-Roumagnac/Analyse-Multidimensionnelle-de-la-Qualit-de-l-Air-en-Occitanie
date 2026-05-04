@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Roumagnac Hugo, Ait Mahammed Salim" />
+
+
+<title>Quel est l’impact du niveau de vie sur la qualité de l’air?</title>
+
+<script src="Problematique_1_files/header-attrs-2.30/header-attrs.js"></script>
+<script src="Problematique_1_files/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="Problematique_1_files/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="Problematique_1_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="Problematique_1_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="Problematique_1_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="Problematique_1_files/navigation-1.1/tabsets.js"></script>
+<link href="Problematique_1_files/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="Problematique_1_files/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Quel est l’impact du niveau de vie sur la
+qualité de l’air?</h1>
+<h4 class="author">Roumagnac Hugo, Ait Mahammed Salim</h4>
+
+</div>
+
+<div id="TOC">
+<ul>
+<li><a href="#partie-informatique" id="toc-partie-informatique"><span
+class="toc-section-number">1</span> Partie informatique:</a>
+<ul>
+<li><a href="#diagramme-dactivit%C3%A9s"
+id="toc-diagramme-dactivités"><span
+class="toc-section-number">1.1</span> Diagramme d’activités</a></li>
+</ul></li>
+<li><a
+href="#requ%C3%AAtes-sql-pour-r%C3%A9pondre-au-probl%C3%A8me-statistique"
+id="toc-requêtes-sql-pour-répondre-au-problème-statistique"><span
+class="toc-section-number">2</span> Requêtes SQL pour répondre au
+problème statistique</a>
+<ul>
+<li><a href="#justification-du-choix-des-vues-sql"
+id="toc-justification-du-choix-des-vues-sql"><span
+class="toc-section-number">2.1</span> Justification du choix des Vues
+SQL</a></li>
+<li><a href="#structuration-des-vues"
+id="toc-structuration-des-vues"><span
+class="toc-section-number">2.2</span> Structuration des Vues</a></li>
+<li><a
+href="#affichage-dune-requ%C3%AAtes-qui-pour-objectif-detre-extrai-en-fichier-csv"
+id="toc-affichage-dune-requêtes-qui-pour-objectif-detre-extrai-en-fichier-csv"><span
+class="toc-section-number">2.3</span> Affichage d’une requêtes qui pour
+objectif d’etre extrai en fichier CSV</a></li>
+<li><a href="#probl%C3%A8mes-rencontr%C3%A9-lors-de-la-conception"
+id="toc-problèmes-rencontré-lors-de-la-conception"><span
+class="toc-section-number">2.4</span> Problèmes rencontré lors de la
+conception</a></li>
+</ul></li>
+<li><a href="#partie-statistique" id="toc-partie-statistique"><span
+class="toc-section-number">3</span> Partie Statistique</a>
+<ul>
+<li><a href="#affinage-de-la-probl%C3%A9matique"
+id="toc-affinage-de-la-problématique"><span
+class="toc-section-number">3.1</span> Affinage de la
+problématique</a></li>
+<li><a
+href="#construire-les-tables-contenant-les-informations-n%C3%A9cessaires-au-traitement-statistique"
+id="toc-construire-les-tables-contenant-les-informations-nécessaires-au-traitement-statistique"><span
+class="toc-section-number">3.2</span> Construire les tables contenant
+les informations nécessaires au traitement statistique</a></li>
+<li><a
+href="#description-des-%C3%A9chantillons-de-donn%C3%A9es-extraits"
+id="toc-description-des-échantillons-de-données-extraits"><span
+class="toc-section-number">3.3</span> Description des échantillons de
+données extraits</a></li>
+<li><a href="#r%C3%A9sumer-des-vues-permetant-lanalyse-statistique"
+id="toc-résumer-des-vues-permetant-lanalyse-statistique"><span
+class="toc-section-number">3.4</span> Résumer des vues permetant
+l’analyse statistique</a></li>
+<li><a
+href="#choix-et-justification-des-indicateurs-et-outils-de-visualisation"
+id="toc-choix-et-justification-des-indicateurs-et-outils-de-visualisation"><span
+class="toc-section-number">3.5</span> Choix et justification des
+indicateurs et outils de visualisation</a></li>
+<li><a href="#justification-des-indicateurs-statistiques"
+id="toc-justification-des-indicateurs-statistiques"><span
+class="toc-section-number">3.6</span> Justification des indicateurs
+statistiques</a></li>
+<li><a href="#justification-des-choix-graphiques"
+id="toc-justification-des-choix-graphiques"><span
+class="toc-section-number">3.7</span> Justification des choix
+graphiques</a></li>
+</ul></li>
+<li><a href="#analyse-univari%C3%A9e-des-variables"
+id="toc-analyse-univariée-des-variables"><span
+class="toc-section-number">4</span> Analyse univariée des variables</a>
+<ul>
+<li><a href="#niveau-de-vie-moyen" id="toc-niveau-de-vie-moyen"><span
+class="toc-section-number">4.1</span> Niveau de vie moyen</a></li>
+<li><a href="#calcul-des-moyennes-de-pollution"
+id="toc-calcul-des-moyennes-de-pollution"><span
+class="toc-section-number">4.2</span> Calcul des moyennes de
+pollution</a></li>
+<li><a href="#calcul-des-%C3%A9cart-types-pour-la-pollution"
+id="toc-calcul-des-écart-types-pour-la-pollution"><span
+class="toc-section-number">4.3</span> Calcul des écart-types pour la
+pollution</a></li>
+<li><a
+href="#conclusion-analyse-univari%C3%A9e-des-communes-%C3%A0-revenus-mod%C3%A9r%C3%A9s"
+id="toc-conclusion-analyse-univariée-des-communes-à-revenus-modérés"><span
+class="toc-section-number">4.4</span> Conclusion analyse univariée des
+communes à revenus modérés</a></li>
+<li><a
+href="#conclusion-analyse-univari%C3%A9e-des-communes-%C3%A0-revenus-%C3%A9lev%C3%A9s"
+id="toc-conclusion-analyse-univariée-des-communes-à-revenus-élevés"><span
+class="toc-section-number">4.5</span> Conclusion analyse univariée des
+communes à revenus élevés</a></li>
+</ul></li>
+<li><a href="#analyse-bivari%C3%A9e-des-variables-et-conclusion"
+id="toc-analyse-bivariée-des-variables-et-conclusion"><span
+class="toc-section-number">5</span> Analyse bivariée des variables et
+conclusion</a>
+<ul>
+<li><a href="#relation-entre-revenu-et-pollution-nuage-de-points"
+id="toc-relation-entre-revenu-et-pollution-nuage-de-points"><span
+class="toc-section-number">5.1</span> Relation entre Revenu et Pollution
+(Nuage de points)</a></li>
+<li><a href="#diagramme-moustache" id="toc-diagramme-moustache"><span
+class="toc-section-number">5.2</span> Diagramme moustache</a></li>
+</ul></li>
+<li><a href="#conclusion" id="toc-conclusion"><span
+class="toc-section-number">6</span> Conclusion</a></li>
+<li><a href="#navigation" id="toc-navigation"><span
+class="toc-section-number">7</span> Navigation</a></li>
+</ul>
+</div>
+
+<style type="text/css">
+
+body, p, td, li {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 18px;
+  line-height: 1.6;
+  text-align: justify;
+  font-weight: normal;    
+  text-decoration: none; 
+}
+
+
+.paragraphe {
+  display: block;
+  font-size: 18px;
+  text-indent: 50px;
+  margin-bottom: 15px;
+  font-weight: normal;
+  text-decoration: none;
+}
+
+
+h1, h2 {
+  font-family: "Times New Roman", Times, serif;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+h1 { font-size: 28pt;
+  margin-top: 40px; 
+  text-align: center;
+  }
+h2 { font-size: 24pt;
+margin-top: 80px;
+margin-bottom: 80px;
+}
+/* Conteneur pour aligner les boutons côte à côte et centrés */
+.nav-button-container {
+    display: flex;
+    justify-content: center;
+    gap: 40px;          /* Espace entre les deux boutons */
+    margin-top: 50px;
+    margin-bottom: 50px;
+    width: 100%;
+}
+
+
+pre, code {
+  font-family: "Courier New", Courier, monospace !important;
+  font-size: 14px !important;
+  font-weight: normal;
+  
+}
+
+</style>
+<style type="text/css">
+padding: 10px 20px;
+  background-color: #95a5a6;
+  color: white !important;
+  border-radius: 20px;
+  text-decoration: none !important;
+  font-size: 0.9em;
+}
+
+.btn-retour:hover {
+  background-color: #7f8c8d;
+}
+</style>
+<div id="partie-informatique" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Partie
+informatique:</h1>
+<div id="diagramme-dactivités" class="section level2" number="1.1">
+<h2><span class="header-section-number">1.1</span> Diagramme
+d’activités</h2>
+<p><img src="./Diagramme_d&#39;activit%C3%A9.png" /></p>
+</div>
+</div>
+<div id="requêtes-sql-pour-répondre-au-problème-statistique"
+class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Requêtes SQL pour
+répondre au problème statistique</h1>
+<div id="justification-du-choix-des-vues-sql" class="section level2"
+number="2.1">
+<h2><span class="header-section-number">2.1</span> Justification du
+choix des Vues SQL</h2>
+<div class="paragraphe">
+<p>L’utilisation de vues plutôt que de tables physiques pour préparer
+nos analyses statistiques répond à un impératif de flexibilité et de
+fiabilité. Contrairement à une table, la vue ne duplique pas les données
+; elle agit comme une fenêtre dynamique sur les tables sources,
+garantissant que les exports CSV sont toujours basés sur les données les
+plus récentes sans risque de désynchronisation. Ce choix permet d’isoler
+des calculs complexes (moyennes, agrégations) dans une structure
+virtuelle stable, simplifiant ainsi le passage de la base de données
+brute à l’outil statistique tout en optimisant l’espace de stockage. En
+résumé, la vue transforme la donnée technique en information métier
+exploitable de manière transparente et sécurisée.</p>
+</div>
+</div>
+<div id="structuration-des-vues" class="section level2" number="2.2">
+<h2><span class="header-section-number">2.2</span> Structuration des
+Vues</h2>
+<ul>
+<li><strong>CREATE VIEW AS</strong>: Correspond à une instruction de
+définition, elle permet d’enregistrer notre requête sous un nom simple.
+L’avantage est que à chaque fois qu’ont l’appelle, les données sont
+recalculées sans occuper d’espace de stockage.</li>
+<li><strong>SELECT</strong>: Correspont à l’instruction d’extraction des
+colonnes que l’ont veux sélectionner.</li>
+<li><strong>JOIN ON </strong>: Correspond à une instruction de liaison,
+elle permettra de lier nos tables entre elles afin de les exploiter pour
+l’analyse statistique.</li>
+<li><strong>WHERE</strong>: Correspond à une instruction de filtrage,
+qui filtre les données qui respectent une condition précise.</li>
+<li><strong>GROUP BY</strong>: Correspond à une instruction de
+regroupement, elle regroupe les lignes d’une table en fonction des
+valeurs d’une ou plusieurs colonnes.</li>
+<li><strong>AVG()</strong>: Correspond à une fonction d’agrégation, elle
+permet le calcule d’une moyenne arithmétique.</li>
+</ul>
+</div>
+<div
+id="affichage-dune-requêtes-qui-pour-objectif-detre-extrai-en-fichier-csv"
+class="section level2" number="2.3">
+<h2><span class="header-section-number">2.3</span> Affichage d’une
+requêtes qui pour objectif d’etre extrai en fichier CSV</h2>
+<div class="paragraphe">
+<p>Pour établir une vue pertinente face à notre analyse statistique,
+cette requêtes extrait les données de nos fichiers CSV,
+<code>QUALITE_AIR</code> , <code>SOCIO_ECONOMIQUES</code> . Elle se nome
+ville_niveau_de_vie_superieur_moyenne. Dans un premiers temps il faut
+selectionner tous les attributs pertinents à notre analyse en utilisant
+l’instruction d’extraction <code>SELECT</code> . Chaque attribut sera
+constitué d’un alias avec une lettre majuscule, ça permet de savoir
+quels attributs appartiennent à quelle table. L’instruction de liaison
+<code>JOIN</code> permet ensuite de fusionner les deux tables en
+utilisant le code INSEE comme point de contact commun via la clause ON.
+L’instruction de filtrage <code>WHERE</code> restreint l’échantillon aux
+communes dont le niveau de vie médian est supérieur à 21 500 €, tout en
+ciblant spécifiquement le polluant PM2.5 pour l’année 2022 dans un
+contexte urbain.</p>
+</div>
+<div class="paragraphe">
+<p>Afin de synthétiser les milliers de relevés quotidiens, nous
+utilisons la fonction d’agrégation <code>AVG</code> , qui calcule la
+pollution moyenne par ville. Cette opération nécessite l’emploi de
+l’instruction de regroupement <code>GROUP BY</code> , qui rassemble
+toutes les données sous un identifiant unique (le code commune). Enfin,
+l’ensemble de cette logique est encapsulé dans l’instruction de
+définition CREATE VIEW, transformant cette requête complexe en une vue.
+Ce choix permet d’automatiser la mise à jour des données et facilite
+l’exportation finale vers un format CSV prêt pour l’interprétation
+statistique.</p>
+</div>
+<pre class="text"><code>curseur.execute(f&quot;&quot;&quot;
+CREATE VIEW ville_niveau_de_vie_superieur_moyenne AS
+SELECT Q.nom_com, Q.code_insee_com, AVG(Q.valeur_poll) AS moyenne_pollution, S.niveau_vie_median_2021
+FROM Qualite_Air Q
+JOIN Socio_economiques S ON Q.code_insee_com = S.code_insee_com
+WHERE S.niveau_vie_median_2021 &gt;= 21500
+  AND Q.nom_poll = &#39;PM2.5&#39; AND Q.annee = 2022
+  AND influence = &#39;Fond&#39; 
+  AND typologie = &#39;Urbaine&#39;
+GROUP BY Q.code_insee_com;
+&quot;&quot;&quot;)</code></pre>
+</div>
+<div id="problèmes-rencontré-lors-de-la-conception"
+class="section level2" number="2.4">
+<h2><span class="header-section-number">2.4</span> Problèmes rencontré
+lors de la conception</h2>
+</div>
+</div>
+<div id="partie-statistique" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Partie Statistique</h1>
+<div id="affinage-de-la-problématique" class="section level2"
+number="3.1">
+<h2><span class="header-section-number">3.1</span> Affinage de la
+problématique</h2>
+<div class="paragraphe">
+<p>Pour répondre à cette problématique, nous avons restreint notre
+analyse aux stations de typologie <code>Urbaine</code> sous influence de
+<code>Fond</code>. Ce choix méthodologique permet de mesurer la
+pollution moyenne subie par la population, en s’affranchissant des
+sources d’émission directes comme le trafic routier ou les zones
+industrielles. Par ailleurs, nous avons choisi de nous concentrer
+exclusivement sur les particules fines <code>PM2.5</code>. Celles-ci
+constituent l’indicateur le plus pertinent pour corréler qualité de
+l’air et niveau de vie, permettant ainsi d’isoler précisément l’impact
+des facteurs socio-économiques sur l’exposition environnementale. Cette
+analyse se concentre sur l’année <code>2022</code> afin d’assurer la
+meilleure cohérence temporelle possible avec les indicateurs
+socio-économiques. En effet, les données les plus récentes concernant le
+niveau de vie médian datent de 2021 ; or, les variations de ce dernier
+étant jugées négligeables sur une période d’un an, ce rapprochement
+offre le cadre d’étude le plus pertinent pour corréler la situation
+financière des ménages et la qualité de l’air. Pour structurer notre
+étude, nous avons établi un seuil de segmentation à
+<code>21 500 €</code> de niveau de vie médian. Cette valeur de référence
+permet de distinguer deux catégories de communes et d’analyser de
+manière comparative l’impact du contexte socio-économique sur la
+pollution atmosphérique. Ce seuil a été défini comme le point de bascule
+statistique pour classer les villes de notre échantillon en deux groupes
+distincts : les communes aux revenus modestes et celles aux revenus plus
+élevés.</p>
+</div>
+</div>
+<div
+id="construire-les-tables-contenant-les-informations-nécessaires-au-traitement-statistique"
+class="section level2" number="3.2">
+<h2><span class="header-section-number">3.2</span> Construire les tables
+contenant les informations nécessaires au traitement statistique</h2>
+<p>Pour répondre à la problématique, il faut être capable de
+sélectionner les taux de concentration PM2.5 correspondant à</p>
+<ul>
+<li>la modalité <strong>PM2.5</strong> de <code>nom_poll</code>,<br />
+</li>
+<li>la modalité <strong>Urbaine</strong> de la variable
+<code>typologie</code>,</li>
+<li>la modalité <strong>Fond</strong> de la variable
+<code>influence</code>,</li>
+<li>la modalité <strong>2022</strong> de la variable
+<code>annee</code>,</li>
+<li>Le seuil de <strong>21 500 €</strong> comme valeur pivot pour la
+variable <code>niveau_vie_median_2021</code>.</li>
+</ul>
+<p>En intégrant l’ensemble de ces filtres, nous avons généré deux
+fichiers CSV distincts segmentant les communes d’Occitanie : l’un
+regroupant les villes dont le niveau de vie médian est inférieur à 21
+500 €, et l’autre celles situées au-dessus de ce seuil.</p>
+</div>
+<div id="description-des-échantillons-de-données-extraits"
+class="section level2" number="3.3">
+<h2><span class="header-section-number">3.3</span> Description des
+échantillons de données extraits</h2>
+<p>Pour mener à bien notre étude comparative, nous avons scindé notre
+jeu de données en deux échantillons distincts basés sur le seuil pivot
+du niveau de vie médian national.</p>
+<p>Ce premier groupe rassemble les municipalités dont le
+<code>niveau de vie médian</code> est strictement inférieur au seuil de
+<code>21 500 €</code>. Les données, issues de la vue SQL correspondante,
+ont été exportées afin d’analyser si une fragilité socio-économique est
+corrélée à une exposition différente aux particules fines
+<code>PM2.5</code>.</p>
+<pre class="r"><code>niveau_vie_inferieur &lt;- read.csv(nom_com, code_insee_com, moyenne_pollution, niveau_vie_median_2021)</code></pre>
+<p>Ce second groupe filtre les communes présentant un
+<code>niveau de vie médian supérieur</code> ou égal à
+<code>21 500</code> €. Cet échantillon sert de groupe de comparaison
+pour vérifier si une aisance financière supérieure permet l’accès à un
+environnement urbain moins pollué ou si, au contraire, la concentration
+de richesses en zone dense augmente l’exposition aux polluants de
+<code>fond</code>.</p>
+<p>Cette vue regroupe les communes identifiées par notre script Python
+dont le revenu fiscal de référence est supérieur au seuil de 21 500
+€.</p>
+<pre class="r"><code>niveau_vie_superieur &lt;- read.csv(nom_com, code_insee_com, moyenne_pollution, niveau_vie_median_2021)</code></pre>
+</div>
+<div id="résumer-des-vues-permetant-lanalyse-statistique"
+class="section level2" number="3.4">
+<h2><span class="header-section-number">3.4</span> Résumer des vues
+permetant l’analyse statistique</h2>
+<p>Résumé de la vue contenant les villes ayant un niveau de vie médian
+inférieur à la moyenne:</p>
+<pre class="r"><code>summary(niveau_vie_inferieur)</code></pre>
+<pre><code>##             nom_com.code_insee_com.moyenne_pollution.niveau_vie_median_2021
+##  LOURDES;65286;7.548091603053435;18810.0    :1                             
+##  MONTPELLIER;34172;8.72962962962963;19670.0 :1                             
+##  NIMES;30189;9.31974921630094;18760.0       :1                             
+##  PERPIGNAN;66136;9.199530516431924;17380.0  :1                             
+##  SAINT-GIRONS;9261;8.418340611353711;20320.0:1                             
+##  TARBES;65440;10.613215859030836;19070.0    :1</code></pre>
+<p>Résumé de la vue contenant les villes ayant un niveau de vie médian
+supérieur à la moyenne:</p>
+<pre class="r"><code>summary(niveau_vie_superieur )</code></pre>
+<pre><code>##                nom_com.code_insee_com.moyenne_pollution.niveau_vie_median_2021
+##  ARGELES-GAZOST;65025;8.617821782178218;21770.0:1                             
+##  AUCH;32013;14.005405405405407;21800.0         :1                             
+##  MONTAUBAN;82121;11.700615384615384;21630.0    :1                             
+##  RODEZ;12202;6.899553571428571;22210.0         :1                             
+##  TOULOUSE;31555;9.746520146520147;22140.0      :1</code></pre>
+<p>Ces deux fichiers regroupent les données nécessaires pour comparer la
+situation des communes selon leur profil économique et la qualité de
+leur air (mesure des particules <code>PM2.5</code>).</p>
+<ul>
+<li><p><strong>Vue “Niveau de vie inférieur”</strong> : Ce fichier liste
+les communes où les revenus des habitants sont les plus modestes. On y
+retrouve plusieurs centres urbains de taille moyenne répartis sur le
+territoire. L’objectif est d’observer si ces zones sont plus exposées à
+la pollution atmosphérique.</p></li>
+<li><p><strong>Vue “Niveau de vie supérieur”</strong> : Ce fichier
+rassemble les communes plus aisées économiquement. Il permet de vérifier
+si un niveau de vie plus élevé se traduit systématiquement par un
+environnement plus sain ou si, au contraire, l’activité économique de
+ces villes s’accompagne d’une pollution importante.</p></li>
+</ul>
+</div>
+<div
+id="choix-et-justification-des-indicateurs-et-outils-de-visualisation"
+class="section level2" number="3.5">
+<h2><span class="header-section-number">3.5</span> Choix et
+justification des indicateurs et outils de visualisation</h2>
+<div class="paragraphe">
+<p>La transformation de données brutes, souvent hétérogènes et
+volumineuses, en informations métier exploitables nécessite une rigueur
+méthodologique stricte. Pour ce projet, nous avons sélectionné un
+ensemble d’indicateurs de position et de dispersion permettant de
+capturer la réalité statistique des relevés de PM2.5 en Occitanie.</p>
+</div>
+</div>
+<div id="justification-des-indicateurs-statistiques"
+class="section level2" number="3.6">
+<h2><span class="header-section-number">3.6</span> Justification des
+indicateurs statistiques</h2>
+<ul>
+<li><p><strong>La Moyenne</strong> : Elle est utilisée comme indicateur
+central pour stabiliser les milliers de relevés quotidiens de particules
+<code>PM2.5</code>. Elle permet d’obtenir une valeur représentative de
+l’exposition globale d’une commune sur l’année, facilitant ainsi la
+comparaison directe entre les différents niveaux de vie.</p></li>
+<li><p><strong>L’Écart-type</strong> : Cet indicateur est essentiel pour
+mesurer la dispersion des données. Il nous permet de savoir si la
+pollution d’une ville est constante tout au long de l’année ou si elle
+subit des pics brutaux. Un écart-type élevé signalera une qualité de
+l’air instable, indépendamment du niveau de richesse de la
+commune.</p></li>
+</ul>
+</div>
+<div id="justification-des-choix-graphiques" class="section level2"
+number="3.7">
+<h2><span class="header-section-number">3.7</span> Justification des
+choix graphiques</h2>
+<div class="paragraphe">
+<p>Afin de rendre les résultats visuels et compréhensibles, nous avons
+retenu quatre types de représentations :</p>
+</div>
+<ul>
+<li><p><strong>Diagrammes en barres (Niveau de vie et
+Pollution)</strong> : Ce format est idéal pour comparer des catégories
+distinctes (les deux groupes de villes). Il permet de visualiser
+instantanément les décrochages entre le groupe “modeste” et le groupe
+“aisé”, tant sur le plan financier que sur le plan des concentrations de
+polluants.</p></li>
+<li><p><strong>Diagramme en barres de l’écart-type</strong> : Il sert à
+comparer la “stabilité” de l’air entre les communes. Plus la barre est
+haute, plus l’air de la ville est soumis à des variations
+importantes.</p></li>
+<li><p><strong>Nuage de points (Scatter Plot)</strong> : Ce graphique
+permet de voir d’un seul coup d’œil s’il existe une tendance ou si, au
+contraire, la richesse et la pollution évoluent de manière totalement
+indépendante.</p></li>
+<li><p><strong>Diagramme en moustache (Boxplot)</strong> : Il permet de
+visualiser la médiane, les quartiles et l’étendue des valeurs de
+pollution. Il est utile pour mettre en évidence les disparités internes
+et identifier si les records de pollution se concentrent davantage dans
+une catégorie de villes plutôt qu’une autre.</p></li>
+</ul>
+</div>
+</div>
+<div id="analyse-univariée-des-variables" class="section level1"
+number="4">
+<h1><span class="header-section-number">4</span> Analyse univariée des
+variables</h1>
+<div class="paragraphe">
+<p>L’analyse univariée constitue la première étape fondamentale de tout
+processus statistique. Elle consiste à isoler chaque variable du jeu de
+données pour en examiner les caractéristiques intrinsèques,
+indépendamment de toute interaction avec d’autres facteurs. Cette
+approche permet de dresser un profil précis de la distribution,
+d’identifier la tendance centrale (moyenne, médiane) et de mesurer la
+dispersion (écart-type, étendue) des relevés de pollution ou des
+indicateurs socio-économiques.</p>
+</div>
+<div id="niveau-de-vie-moyen" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> Niveau de vie
+moyen</h2>
+<pre class="r"><code>moy_inf &lt;- mean(inf$niveau_vie_median_2021, na.rm = TRUE)
+moy_sup &lt;- mean(sup$niveau_vie_median_2021, na.rm = TRUE)
+
+
+par(mfrow = c(1, 2), mar = c(5, 6, 4, 4))
+
+
+barplot(moy_inf, names.arg = &quot;Ville inférieur économiquement&quot;, col = &quot;#4E79A7&quot;, 
+        main = &quot;Niveau de vie moyen&quot;, ylab = &quot;Euros (€)&quot;,
+        ylim = c(0, moy_inf * 1.2))
+text(x = 0.7, y = moy_inf, labels = round(moy_inf, 0), pos = 3)
+
+barplot(moy_sup, names.arg = &quot;Ville supérieur économiquement&quot;, col = &quot;#F28E2B&quot;, 
+        main = &quot;Niveau de vie moyen&quot;, ylab = &quot;Euros (€)&quot;,
+        ylim = c(0, moy_sup * 1.2))
+text(x = 0.7, y = moy_sup, labels = round(moy_sup, 0), pos = 3)</code></pre>
+<img src="Problematique_1_files/figure-html/unnamed-chunk-9-1.png" alt="" width="672" />
+<div class="paragraphe">
+<p>Les villes inférieur économiquement ont une distribution de revenus
+dont la valeur centrale s’établit à <code>19 221 €</code>. Cette moyenne
+arithmétique synthétise un échantillon dont les relevés individuels
+débutent à <code>17 810 €</code>.</p>
+</div>
+<div class="paragraphe">
+<p>Les villes supérieur économiquement ont une tendance centrale mis en
+évidence via un niveau de vie moyen de <code>22 129 €</code>. Cette
+valeur est issue d’une distribution de données dont le maximum atteint
+est <code>24 930 €</code>.</p>
+</div>
+</div>
+<div id="calcul-des-moyennes-de-pollution" class="section level2"
+number="4.2">
+<h2><span class="header-section-number">4.2</span> Calcul des moyennes
+de pollution</h2>
+<pre class="r"><code>moy_p_inf &lt;- mean(inf$moyenne_pollution, na.rm = TRUE)
+moy_p_sup &lt;- mean(sup$moyenne_pollution, na.rm = TRUE)
+
+par(mfrow = c(1, 2), mar = c(5, 6, 4, 4))
+
+barplot(moy_p_inf, names.arg = &quot;Ville inférieur économiquement&quot;, col = &quot;#4E79A7&quot;, 
+        main = &quot;PM2.5 moyen&quot;, ylab = &quot;µg/m³&quot;,
+        ylim = c(0, moy_p_inf * 1.3))
+text(x = 0.7, y = moy_p_inf, labels = round(moy_p_inf, 2), pos = 3)
+
+barplot(moy_p_sup, names.arg = &quot;Ville_supérieur économiquement&quot;, col = &quot;#F28E2B&quot;, 
+        main = &quot;PM2.5 moyen&quot;, ylab = &quot;µg/m³&quot;,
+        ylim = c(0, moy_p_sup * 1.3))
+text(x = 0.7, y = moy_p_sup, labels = round(moy_p_sup, 2), pos = 3)</code></pre>
+<img src="Problematique_1_files/figure-html/unnamed-chunk-10-1.png" alt="" width="672" />
+<div class="paragraphe">
+<p>L’analyse montre une pollution plus élevée dans les communes les plus
+aisées. Les villes ayant un niveau de vie inférieur affichent une
+concentration moyenne de <code>8,97 µg/m³</code>, contre
+<code>10,19 µg/m³</code> pour les villes au niveau de vie supérieur.</p>
+</div>
+</div>
+<div id="calcul-des-écart-types-pour-la-pollution"
+class="section level2" number="4.3">
+<h2><span class="header-section-number">4.3</span> Calcul des
+écart-types pour la pollution</h2>
+<pre class="r"><code>sd_p_inf &lt;- sd(inf$moyenne_pollution, na.rm = TRUE)
+sd_p_sup &lt;- sd(sup$moyenne_pollution, na.rm = TRUE)
+
+par(mfrow = c(1, 2), mar = c(5, 6, 4, 4))
+
+barplot(sd_p_inf, names.arg = &quot;ville inférieur économiquement&quot;, col = &quot;#4E79A7&quot;, 
+        main = &quot;Dispersion&quot;, ylab = &quot;Écart (µg/m³)&quot;,
+        ylim = c(0, max(sd_p_inf, sd_p_sup) * 1.3))
+text(x = 0.7, y = sd_p_inf, labels = round(sd_p_inf, 2), pos = 3)
+
+barplot(sd_p_sup, names.arg = &quot;ville supérieur économiquement&quot;, col = &quot;#F28E2B&quot;, 
+        main = &quot;Dispersion&quot;, ylab = &quot;Écart (µg/m³)&quot;,
+        ylim = c(0, max(sd_p_inf, sd_p_sup) * 1.3))
+text(x = 0.7, y = sd_p_sup, labels = round(sd_p_sup, 2), pos = 3)</code></pre>
+<img src="Problematique_1_files/figure-html/unnamed-chunk-11-1.png" alt="" width="672" />
+<div class="paragraphe">
+<p>On observe une forte hétérogénéité au sein du groupe le plus riche.
+L’écart-type est de <code>1,03 µg/m³</code> pour les villes ayant un
+niveau de vie inférieur, ce qui indique une pollution relativement
+stable et homogène d’une ville à l’autre. À l’inverse, il grimpe à
+<code>2,75 µg/m³</code> pour les villes au niveau de vie supérieur,
+révélant des situations très disparates au sein de cette catégorie.</p>
+</div>
+</div>
+<div id="conclusion-analyse-univariée-des-communes-à-revenus-modérés"
+class="section level2" number="4.4">
+<h2><span class="header-section-number">4.4</span> Conclusion analyse
+univariée des communes à revenus modérés</h2>
+<div class="paragraphe">
+<p>Les communes ayant un revenus modérés ont un niveau de vie moyen est
+de 19 221 €. L’étude de la variable environnementale au sein de cet
+échantillon permet de dresser les conclusions suivantes :</p>
+</div>
+<ul>
+<li><strong>Tendance centrale</strong> : La concentration moyenne en
+particules fines <code>PM2.5</code> s’établit à <code>8,97 µg/m³</code>.
+Ce résultat indique une exposition chronique significative pour
+l’ensemble des communes de ce groupe.</li>
+<li><strong>Indice de dispersion</strong> : L’écart-type est
+particulièrement faible, s’élevant à <code>1,03</code>. En statistique,
+cette valeur proche de zéro démontre une forte homogénéité des
+données.</li>
+</ul>
+<div class="paragraphe">
+<p>On en déduit que la qualité de l’air est uniforme au sein de ces
+communes à bas revenue. Il n’existe pas de disparités majeures entre ces
+communes ; elles subissent toutes un niveau de pollution similaire, ce
+qui rend le profil environnemental de ce segment très prévisible.</p>
+</div>
+</div>
+<div id="conclusion-analyse-univariée-des-communes-à-revenus-élevés"
+class="section level2" number="4.5">
+<h2><span class="header-section-number">4.5</span> Conclusion analyse
+univariée des communes à revenus élevés</h2>
+<div class="paragraphe">
+<p>le niveau de vie moyen pour ces communes s’élève à
+<code>22 129 €</code>, présente une structure statistique sensiblement
+différente :</p>
+</div>
+<ul>
+<li><p><strong>Tendance centrale</strong> : La moyenne de pollution
+enregistrée est de <code>10,19 µg/m³</code>. Ce chiffre constitue la
+valeur de référence autour de laquelle s’organisent les relevés de ce
+groupe.</p></li>
+<li><p><strong>Indice de dispersion</strong> : On observe un écart-type
+de <code>2,75</code>. Cette valeur, nettement plus élevée que dans le
+groupe précédent, traduit une hétérogénéité des mesures.</p>
+<div class="paragraphe">
+<p>Cette dispersion importante révèle l’existence de contrastes locaux
+marqués. Au sein de ce même échantillon, certaines communes bénéficient
+d’un air plus sain tandis que d’autres font face à des concentrations
+beaucoup plus fortes. La moyenne est donc ici moins représentative de
+chaque cas particulier, illustrant une situation environnementale plus
+instable et diversifiée.</p>
+</div></li>
+</ul>
+</div>
+</div>
+<div id="analyse-bivariée-des-variables-et-conclusion"
+class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Analyse bivariée des
+variables et conclusion</h1>
+<div class="paragraphe">
+<p>L’analyse bivariée a pour objectif d’explorer la relation statistique
+entre deux variables : le niveau de vie médian (variable indépendante ou
+explicative) et la concentration en particules fines PM2.5 (variable
+dépendante ou expliquée). Contrairement à l’étape précédente, nous ne
+considérons plus les groupes comme des entités closes, mais nous
+cherchons à mesurer l’influence du facteur économique sur la qualité de
+l’air.</p>
+</div>
+<div class="paragraphe">
+<p>Cette phase de l’étude s’articule autour de trois axes analytiques
+majeurs :</p>
+</div>
+<ul>
+<li><p><strong>La direction de la relation</strong> : Nous cherchons à
+déterminer s’il existe une corrélation positive
+<code>les deux variables progressent ensemble</code>, négative
+<code>l'une diminue quand l'autre augmente</code> ou si elles sont
+totalement indépendantes.</p></li>
+<li><p><strong>La force du lien</strong> : Grâce à l’étude des écarts
+entre les moyennes et l’observation des nuages de points, nous évaluons
+si le niveau de revenu est un prédicteur fiable de l’exposition à la
+pollution.</p></li>
+<li><p><strong>L’analyse des contrastes de dispersion</strong> : En
+croisant les écarts-types de chaque groupe, nous vérifions si la
+richesse d’une commune impacte non seulement le taux de pollution moyen,
+mais aussi la stabilité de ce taux.</p></li>
+</ul>
+<div class="paragraphe">
+<p>En somme, cette approche bivariée permet de tester notre hypothèse de
+départ : le niveau de vie des administrés conditionne-t-il leur
+exposition aux particules fines ? C’est par ce croisement que nous
+pourrons identifier d’éventuelles inégalités environnementales au sein
+de la région.</p>
+</div>
+<div id="relation-entre-revenu-et-pollution-nuage-de-points"
+class="section level2" number="5.1">
+<h2><span class="header-section-number">5.1</span> Relation entre Revenu
+et Pollution (Nuage de points)</h2>
+<p><img src="Problematique_1_files/figure-html/bivarie%CC%81e_scatter-1.png" alt="" width="960" /></p>
+<div class="paragraphe">
+<p>L’observation du nuage de points révèle une corrélation positive
+entre le niveau de vie médian et la concentration en particules fines.
+La droite de régression présente une inclinaison ascendante, indiquant
+que l’élévation des revenus s’accompagne, dans cet échantillon, d’une
+dégradation de la qualité de l’air. Si les communes aux revenus modestes
+forment un cluster homogène en zone de faible pollution, les communes
+aisées se répartissent sur un spectre beaucoup plus large, confirmant
+que la richesse économique ne constitue pas un facteur de protection
+contre l’exposition aux PM2.5.</p>
+</div>
+</div>
+<div id="diagramme-moustache" class="section level2" number="5.2">
+<h2><span class="header-section-number">5.2</span> Diagramme
+moustache</h2>
+<img src="Problematique_1_files/figure-html/analyse_boite_moustache-1.png" alt="" width="768" />
+<div class="paragraphe">
+<p>Le diagramme en moustache met en exergue la disparité des situations
+environnementales selon le profil socio-économique. La médiane du groupe
+au niveau de vie supérieur est nettement décalée vers le haut par
+rapport à celle du groupe inférieur, validant une exposition
+structurellement plus forte. De plus, l’étalement important de la boîte
+et des moustaches pour les communes aisées démontre une forte
+hétérogénéité : alors que les villes modestes jouissent d’une qualité de
+l’air stable, les records de pollution de l’étude se concentrent
+exclusivement au sein des pôles urbains les plus riches.</p>
+</div>
+</div>
+</div>
+<div id="conclusion" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> Conclusion</h1>
+<div class="paragraphe">
+<p>En conclusion, l’analyse croisée des données démontre que le niveau
+de vie exerce un impact paradoxal sur la qualité de l’air en Occitanie.
+Contrairement à l’hypothèse d’une vulnérabilité environnementale des
+populations précaires, les résultats révèlent que l’accroissement de la
+richesse communale est corrélé à une augmentation des concentrations de
+PM2.5.</p>
+</div>
+<div class="paragraphe">
+<p>Cet impact s’explique par la concentration des revenus élevés dans
+des zones à forte densité d’activités et de transports, générant une
+pollution de fond plus intense. Ainsi, dans le cadre de cette étude, un
+niveau de vie élevé est synonyme d’une exposition environnementale plus
+subie et plus instable, invalidant l’idée d’un environnement plus sain
+pour les communes les plus favorisées économiquement.</p>
+</div>
+</div>
+<div id="navigation" class="section level1" number="7">
+<h1><span class="header-section-number">7</span> Navigation</h1>
+<div
+style="display: flex; justify-content: space-between; margin-top: 50px;">
+<p><a href="../Sommaire.html"
+style="text-decoration: none; color: #2c3e50; border: 1px solid #2c3e50; padding: 8px 15px; border-radius: 5px;">Retour
+à l’accueil</a></p>
+<p><a href="./Problematique_2/Problematique_2.html"
+style="text-decoration: none; color: #2c3e50; border: 1px solid #2c3e50; padding: 8px 15px; border-radius: 5px;">Problématique
+suivante</a></p>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

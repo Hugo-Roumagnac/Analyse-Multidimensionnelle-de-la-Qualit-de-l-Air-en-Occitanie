@@ -1,0 +1,346 @@
+---
+title: "Analyse multidimensionnelle de la qualité de l'air en Occitanie : de la structuration des données à l'étude statistique "
+author: ""
+output: 
+  html_document: 
+    toc: true
+    toc_depth: 2
+    number_sections: true
+---
+
+```{css, echo=FALSE}
+/* Force la police sans gras ni soulignement pour le texte courant */
+body, p, td, li {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 18px;
+  line-height: 1.6;
+  text-align: justify;
+  font-weight: normal;    /* Retire le gras */
+  text-decoration: none;  /* Retire le soulignement */
+}
+
+/* Style spécifique pour tes paragraphes avec alinéa */
+.paragraphe {
+  display: block;
+  font-size: 18px;
+  text-indent: 50px;
+  margin-bottom: 15px;
+  font-weight: normal;
+  text-decoration: none;
+}
+
+/* Les titres gardent leur importance visuelle */
+h1, h2{
+  font-family: "Times New Roman", Times, serif;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+h1 { font-size: 28pt; 
+margin-top: 40px;
+text-align: center;
+}
+h2 { font-size: 24pt;
+margin-top: 80px;
+margin-bottom: 80px;
+}
+
+/* Conteneur pour centrer le bouton sur la page */
+.center-button-container {
+    display: flex;
+    justify-content: center; /* Centre horizontalement le bouton */
+    align-items: center;
+    margin: 20px 0;
+    width: 100%;             /* Prend toute la largeur de la page */
+}
+
+/* Style du bouton unique et uniforme */
+.btn-custom-grey {
+    background-color: #6c757d !important;
+    color: white !important;
+    border: none !important;
+    padding: 20px 30px !important;    /* Espace intérieur généreux */
+    border-radius: 8px !important;
+    text-decoration: none !important;
+    transition: 0.3s;
+    
+    /* --- STRUCTURE UNIFORME --- */
+    display: flex !important;         /* Utilisation de Flex pour le texte */
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    
+    /* --- TAILLE ET AFFICHAGE DU TEXTE --- */
+    width: 700px !important;          /* Largeur fixe identique pour tous */
+    min-height: 80px !important;      /* Hauteur minimale pour le texte long */
+    font-size: 18px !important;       /* Taille lisible */
+    line-height: 1.2 !important;      /* Espacement des lignes si texte long */
+    word-wrap: break-word !important; /* Force le texte à rester à l'intérieur */
+}
+
+.btn-custom-grey:hover {
+    background-color: #5a6268 !important;
+    transform: scale(1.02);
+    color: white !important;
+}
+/* Blocs de code (ASCII Art / Arborescence) */
+pre, code {
+  font-family: "Courier New", Courier, monospace !important;
+  font-size: 14px !important;
+  font-weight: normal;
+  
+}
+
+```
+
+
+```{css, echo=FALSE}
+padding: 10px 20px;
+  background-color: #95a5a6;
+  color: white !important;
+  border-radius: 20px;
+  text-decoration: none !important;
+  font-size: 0.9em;
+}
+
+.btn-retour:hover {
+  background-color: #7f8c8d;
+}
+```
+
+```{r, include = FALSE}
+#--- : Permet d'isoler les paramètres de configuration ci-dessous 
+#title: Titre principal du document
+#author: Auteur principal du document
+#output: Permet de dire R quel type de fichier construire quand on exécute notre fichier
+#toc: true Crée automatiquement un sommaire, en lisant les titres commençant par # ou ##
+#toc_depth: 2 Les grands titres sont determiner avec # et les sous titres ##
+#number_sections permet numeroter automatiquement devant les titres
+#.unlisted:Retire le titre du sommaire
+#.unnumbered:Retire la numérotation automatique
+```
+
+
+
+# Présentation du projet
+<div class="paragraphe"> 
+Ce projet, réalisé dans le cadre de l’`UE 403` en `L2 MIASHS`, a pour objectif d’analyser `la qualité de l’air en Occitanie` en combinant une approche informatique pour cela nous allons constructruire d’une base de données relationnelle à partir de trois fichiers `CSV` fournis : données de pollution, `géographiques/climatiques et socio-économiques` et  effectué une analyse statistique `descriptive` univariée et bivariée de nos variables. Après avoir structuré la base de données et extrait les tables pertinentes, Nous avons identifié quatre problématiques statistiques dont nous avons pu répondre à l’aide d’`outils` adaptés, en privilégiant la rigueur analytique. Le projet s’est déroulé sur 11 séances, incluant une présentation orale à mi-parcours (6 minutes avec diagramme de Gantt) et la rédaction d’un rapport final en `R Markdown`, divisé en deux parties : la première détaillant la construction de la base et les requêtes d’extraction, la seconde présentant les analyses statistiques et les réponses aux problématiques. 
+</div>
+## Sruture du rapport
+<div class="paragraphe">
+Cette section se concentre sur les aspects fondamentaux de l’architecture informatique. Ces éléments constituent le socle de notre traitement statistique et ne seront pas réitérés dans les analyses spécifiques afin d'assurer la concision de l'étude. 
+</div>
+
+# Partie informatique généraliste:
+## Objectif
+<div class="paragraphe"> 
+L’objectif de cette partie est de concevoir une base de données relationnelle via le langage Python et sa bibliothèque SQLite3, afin d'assurer un stockage local et structuré des données brutes. Cette phase de modélisation permettra d'exécuter des requêtes d'extraction complexes, générant ainsi les tables nécessaires à l'analyse statistique descriptive. Pour ce faire, notre démarche se structure en plusieurs étapes clés : nous débuterons par une représentation graphiquedu de notre code via un diagramme d’activités, avant de définir l’architecture logique des données à travers un schéma Entité-Association. Une fois cette structure établie, nous procéderons à l'implémentation des tables en précisant leurs attributs, types et contraintes d’intégrité. Par la suite, une attention particulière sera portée à la gestion des doublons pour garantir la fiabilité des informations. Enfin, nous formulerons les requêtes SQL spécifiques à notre problématique, lesquelles serviront de fondation directe à nos futurs calculs et visualisations statistiques. 
+</div>
+## Représentation graphique de la structure du code 
+## Organisation des fichiers
+
+```text
+Projet_Pollution/
+├── 1_Problématique_1/
+│   ├── Donnée/
+│   │   ├── mesure_Occitanie_journaliere_pollution.csv
+│   │   ├── donnees_socio_economiques.csv
+│   │   ├── donne_geo_climatiques.csv
+│   │   └── base_de_donnée.db
+│   ├── script/
+│   │   ├── importation.py          # Remplit les tables SQLite via les CSV
+│   │   ├── doublon.py              # Détection et gestion des doublons
+│   │   └── extraction.py           # Génère les fichiers CSV pour l'analyse
+│   ├── Exportation/
+│   │   ├── ville_superieure.csv
+│   │   └── ville_inferieur.csv
+├── 2_Problématique_2/
+├── 3_Problématique_3/
+└── 4_Problématique_4/
+└── main.py                         # Programme principal  
+```
+
+## Schémas Entité-Association
+<div class="paragraphe"> 
+Le schéma Entité-Association sert à modéliser de manière graphique et simplifiée l'architecture de la base de données, permettant ainsi de visualiser clairement les relations logiques et les interactions entre les différentes catégories d'informations avant leur implémentation technique.</div>
+```text
+_________________________________                      _________________________________
+ |    SOCIO_ECONOMIQUES            |                    |          QUALITE_AIR            |
+ |_________________________________|                    |_________________________________|
+ | - id_Socio_economiques (PK)     |                    | - id_Qualite_aire (PK)          |
+ | - niveau_vie_median_2021        |                    | - nom_station                   |
+ | - nb_logements_2022             |                    | - code_station                  |
+ | - Pourcentage_appartements      |                    | - typologie                     |
+ | - pourcentage_locataires        |                    | - influence                     |
+ | - evolution_pop_annuelle        |                    | - nom_poll                      |
+ | - population_municipale_2023    |                    | - valeur_poll                   |
+ | - Tax_activite_15_64            |                    | - jour                          |
+ |                                 |                    | - mois                          |
+ |                                 |                    | - annee                         |
+ |_________________________________|                    |_________________________________|
+                 |                                                       |
+                 | (1,1)                                                 | (1,n)
+                 |                                                       |
+       /~~~~~~~~~~~~~~~~~~~\                                   /~~~~~~~~~~~~~~~~~~~\
+      (    CARACTÉRISER     )                                 (      EFFECTUER      )
+       \___________________/                                   \___________________/
+                 |                                                       |
+                 | (1,1)                                                 | (1,1)
+                 |_______________________________________________________|
+                                          |
+                        __________________|__________________
+                       |  GEOGRAPHIQUES_ET_CLIMATIQUES       |
+                       |_____________________________________|
+                       | - id_Geographique_et_climatiques(PK)|
+                       | - code_insee_com                    |
+                       | - nom_com                           |
+                       | - reg_code                          |
+                       | - reg_nom                           |
+                       | - dep_code                          |
+                       | - dep_nom                           |
+                       | - population                        |
+                       | - superficie_km2                    |
+                       | - densite                           |
+                       | - densite_cat                       |
+                       | - latitude                          |
+                       | - longitude                         |
+                       | - alti_med                          |
+                       | - RR_med                            |
+                       | - NBJRR1_med                        |
+                       | - NBJRR5_med                        |
+                       | - NBJRR10_med                       |
+                       | - Tmin_med                          |
+                       | - Tmax_med                          |
+                       | - Tens_vap_med                      |
+                       | - Force_vent_med                    |
+                       | - Insolation_med                    |
+                       | - Rayonnement_med                   |
+                       |_____________________________________|
+```
+## Création des tables(Attribues, types, contraintes)
+## Synthèse et justifications des méthodes techniques
+<div class="paragraphe">
+Le choix de l'interface SQLite3 permet une gestion simplifiée de la donnée : la base est stockée dans un fichier unique, ce qui assure une portabilité totale du projet. L'implémentation repose sur une séquence logique de méthodes
+</div>
+:::{.balise} 
+* **Gestion de l'interface SQLite3** :
+L’utilisation de la bibliothèque ` SQLite3`  assure une gestion simplifiée et portable de la donnée, la base étant confinée dans un fichier unique `.db`. Le script initialise la connexion via `connect()` et sollicite un `cursor()` pour traduire les instructions Python en commandes SQL. Cette architecture permet de piloter l'intégralité du cycle de vie des données depuis un environnement de programmation unique.
+
+```text
+db = sqlite3.connect("./Donnée/base_de_donnée.db")
+curseur = db.cursor()
+```
+:::
+:::{.balise}  
+* **Sécurisation et intégrité de la structure** :
+Afin de garantir un environnement de travail sain, le script utilise systématiquement des instructions `DROP TABLE IF EXISTS`. Cette méthode de nettoyage préventif permet de réinitialiser les schémas à chaque exécution, évitant ainsi les conflits de structure ou la corruption des métadonnées. La persistance de ces modifications est ensuite scellée par la méthode `commit()`, qui valide l'écriture physique sur le disque.
+
+```text
+curseur.execute("DROP TABLE IF EXISTS Geographiques_et_climatiques")
+curseur.execute("DROP TABLE IF EXISTS Qualite_Air")
+curseur.execute("DROP TABLE IF EXISTS Socio_economiques")
+```
+:::
+:::{.balise}   
+* **Automatisation du typage et architecture** : 
+La définition des tables via `CREATE TABLE` impose un typage rigoureux (`TEXT`, `REAL`, `INTEGER`) qui délègue au moteur SQL le contrôle de la cohérence des données. L'intégration de clés primaires en `AUTOINCREMENT` garantit l'unicité de chaque enregistrement. Cette structuration stricte prévient les erreurs d'insertion et optimise les performances des futures requêtes de jointure et d'analyse statistique.
+
+```text
+curseur.execute("""
+CREATE TABLE Geographiques_et_climatiques(
+    id_Geographique_et_climatiques INTEGER PRIMARY KEY AUTOINCREMENT,
+    code_insee_com TEXT,
+    nom_com TEXT,
+    reg_code TEXT,
+    reg_nom TEXT,
+    dep_code TEXT,
+    dep_nom TEXT,
+    population REAL,
+    superficie_km2 REAL,
+    densite REAL,
+    latitude REAL,
+    longitude REAL,
+    densite_cat TEXT,
+    alti_med REAL,
+    RR_med REAL,
+    NBJRR1_med REAL,
+    NBJRR5_med REAL,
+    NBJRR10_med REAL,
+    Tmin_med REAL,
+    Tmax_med REAL,
+    Tens_vap_med REAL,
+    Force_vent_med REAL,
+    Insolation_med REAL,
+    Rayonnement_med REAL
+)
+""")
+```
+:::
+
+
+## Rappel des définitions des méthodes
+* **execute()** : Méthode qui envoie une instruction SQL spécifique (création, suppression, insertion) à la base.
+* **Table** : Structure de stockage organisée en lignes et colonnes (ex: Qualite_Air).
+* **Attribut** : Nom d'une colonne représentant une caractéristique (ex: valeur_poll).
+* **Type** : Format de la donnée autorisée dans une colonne (ex: REAL pour les décimaux).
+* **Contrainte** : Règle imposée à une colonne pour garantir la fiabilité (ex: PRIMARY KEY pour l'unicité).
+
+## Exemple d'architecture des Données
+
+```text
+# Rôle : Établit une connexion vers le fichier de base de données SQLite. 
+# Si le répertoire "Donnée" est présent, il cible le fichier .db spécifié.
+db = sqlite3.connect("./Donnée/base_de_donnée.db")
+
+# Bloc : Nettoyage de l'environnement
+# Rôle : Supprime les tables existantes pour garantir l'intégrité des schémas lors de la recréation.
+curseur.execute("DROP TABLE IF EXISTS Geographiques_et_climatiques")
+
+# Bloc : Création de la table Geographiques_et_climatiques
+# Rôle : Définit le schéma technique pour les données géographiques et climatiques (24 colonnes).
+curseur.execute("""
+CREATE TABLE Geographiques_et_climatiques(
+    id_Geographique_et_climatiques INTEGER PRIMARY KEY AUTOINCREMENT,
+    code_insee_com TEXT,
+    nom_com TEXT,
+    reg_code TEXT,
+    reg_nom TEXT,
+    dep_code TEXT,
+    dep_nom TEXT,
+    population REAL,
+    superficie_km2 REAL,
+    densite REAL,
+    latitude REAL,
+    longitude REAL,
+    densite_cat TEXT,
+    alti_med REAL,
+    RR_med REAL,
+    NBJRR1_med REAL,
+    NBJRR5_med REAL,
+    NBJRR10_med REAL,
+    Tmin_med REAL,
+    Tmax_med REAL,
+    Tens_vap_med REAL,
+    Force_vent_med REAL,
+    Insolation_med REAL,
+    Rayonnement_med REAL
+)
+""")
+```
+---
+
+# Accès aux autres problématiques
+
+<div class="center-button-container">
+ [Quels est l'impacte du niveau de vie sur la qualité de l'aire?](Problematique_1/Problematique_1.html){.btn .btn-custom-grey}
+</div>
+<div class="center-button-container">
+ [Quelles disparités observe-t-on entre l'hiver et l'été concernant les concentrations de polluants?](Problematique_2/Problematique_2.html){.btn .btn-custom-grey}
+</div>
+<div class="center-button-container">
+ [Quels est l'impact de la densité démographique sur la qualité de l'air?](Problematique_3/Problematique_3.html){.btn .btn-custom-grey}
+</div>
+<div class="center-button-container">
+[Quels est l'impact de la densité démographique sur la qualité de l'air?](Problematique_4/Problematique_4.html){.btn .btn-custom-grey}
+</div>
+---

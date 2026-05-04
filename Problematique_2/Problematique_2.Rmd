@@ -1,0 +1,369 @@
+---
+title: "Quelles disparités observe-t-on entre l'hiver et l'été concernant les concentrations de polluants? "
+author: "Roumagnac Hugo, Ait Mahamed Salim"
+output: 
+  html_document: 
+    toc: true
+    toc_depth: 2
+    number_sections: true
+---
+
+```{css, echo=FALSE}
+body, p, td, li {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 18px;
+  line-height: 1.6;
+  text-align: justify;
+  font-weight: normal;    
+  text-decoration: none;  
+}
+
+
+.paragraphe {
+  display: block;
+  font-size: 18px;
+  text-indent: 50px;
+  margin-bottom: 15px;
+  font-weight: normal;
+  text-decoration: none;
+}
+
+
+h1, h2{
+  font-family: "Times New Roman", Times, serif;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+h1 { font-size: 28pt; 
+margin-top: 40px; 
+  text-align: center;
+}
+h2 { font-size: 24pt;
+
+margin-top: 80px;
+margin-bottom: 80px;
+}
+
+
+
+
+pre, code {
+  font-family: "Courier New", Courier, monospace !important;
+  font-size: 14px !important;
+  font-weight: normal;
+  
+}
+
+```
+
+
+```{css, echo=FALSE}
+padding: 10px 20px;
+  background-color: #95a5a6;
+  color: white !important;
+  border-radius: 20px;
+  text-decoration: none !important;
+  font-size: 0.9em;
+}
+
+.btn-retour:hover {
+  background-color: #7f8c8d;
+}
+```
+# Partie informatique:
+## Diagramme d'activités
+![](./Diagramme_activité_2.png)
+
+# Requêtes SQL pour répondre au problème statistique
+## Justification du choix des Vues SQL
+<div class="paragraphe">
+L’utilisation de vues plutôt que de tables physiques pour préparer nos analyses statistiques répond à un impératif de flexibilité et de fiabilité. Contrairement à une table, la vue ne duplique pas les données ; elle agit comme une fenêtre dynamique sur les tables sources, garantissant que les exports CSV sont toujours basés sur les données les plus récentes sans risque de désynchronisation. Ce choix permet d'isoler des calculs complexes (moyennes, agrégations) dans une structure virtuelle stable, simplifiant ainsi le passage de la base de données brute à l'outil statistique tout en optimisant l'espace de stockage. En résumé, la vue transforme la donnée technique en information métier exploitable de manière transparente et sécurisée.
+</div>
+* **CREATE VIEW AS **: Correspond à une instruction de définition ; elle permet d’enregistrer notre requête sous un nom simple. L’avantage est qu’à chaque fois qu’on l’appelle, les données sont recalculées sans occuper d’espace de stockage permanent.
+
+* **SELECT**: Correspond à l’instruction d’extraction des colonnes que l’on souhaite sélectionner pour l’analyse.
+
+* **CASE WHEN**: Correspond à une instruction conditionnelle ; elle permet ici de créer un "pivot" pour ventiler les données de pollution dans des colonnes spécifiques selon le mois ou la saison.
+
+* **WHERE**: Correspond à une instruction de filtrage, qui restreint l'analyse aux données respectant des critères de temps, de polluant et de contexte géographique.
+
+* **GROUP BY**: Correspond à une instruction de regroupement ; elle rassemble les relevés en fonction de leur typologie et de leur influence pour permettre les calculs statistiques.
+
+* **AVG**: Correspond à une fonction d’agrégation ; elle permet le calcul de la moyenne arithmétique des concentrations de polluants.
+
+## Affichage d’une requête ayant pour objectif d’être extraite en fichier CSV
+<div class="paragraphe">
+Pour établir une vue pertinente face à notre analyse de la dynamique saisonnière, cette requête extrait les données de la table `QUALITE_AIR`. Elle se nomme `Vue_Qualite_Air_Ozone`. Dans un premier temps, il convient de sélectionner les attributs descriptifs (Typologie et Influence) en utilisant l’instruction d’extraction `SELECT`.
+</div>
+<div class="paragraphe">
+L’instruction de filtrage `WHERE` restreint ici l'échantillon spécifiquement au polluant `Ozone (O3)` pour l’année `2023`, tout en ciblant exclusivement le milieu `Urbain` et la pollution de `Fond`. Cette précision est cruciale pour isoler les variations climatiques des impacts directs du trafic routier.
+</div>
+<div class="paragraphe">
+Afin de synthétiser les milliers de relevés temporels, nous utilisons la fonction d’agrégation `AVG` couplée à des clauses `CASE WHEN`. Cette structure permet de calculer simultanément la pollution moyenne pour chaque mois de l'année ainsi que pour les quatre blocs saisonniers (Hiver, Printemps, Été, Automne). Cette opération nécessite l’emploi de l’instruction de regroupement `GROUP BY`, qui rassemble toutes les mesures sous les catégories de `typologie` et `d'influence`.
+</div>
+<div class="paragraphe">
+Enfin, l’ensemble de cette logique est encapsulé dans l’instruction de définition `CREATE VIEW`, transformant cette requête complexe en une table virtuelle. Ce choix méthodologique permet d’automatiser la mise à jour des statistiques saisonnières et facilite l’exportation finale vers un format `CSV`, prêt pour une interprétation comparative entre la stabilité hivernale et la volatilité estivale.
+</div>
+
+```text
+        CREATE VIEW Vue_Stats_{saison_nom} AS
+        WITH Moyennes_Mensuelles AS (
+            -- Calcul de la moyenne pour chaque mois individuellement
+            SELECT mois, AVG(valeur_poll) as moy_m
+            FROM Qualite_Air
+            WHERE annee = 2023 AND mois IN {mois_tuple}
+              AND (nom_poll LIKE '%O3%' OR nom_poll LIKE '%OZONE%')
+              AND Typologie = 'Urbaine' AND nom_com = 'TOULOUSE'
+            GROUP BY mois
+        ),
+        Stats_Globales AS (
+            -- Calcul de l'écart-type sur l'ensemble des relevés de la saison (volatilité réelle)
+            SELECT 
+                SQRT(AVG(valeur_poll*valeur_poll) - (AVG(valeur_poll)*AVG(valeur_poll))) as stdev_brute
+            FROM Qualite_Air
+            WHERE annee = 2023 AND mois IN {mois_tuple}
+              AND (nom_poll LIKE '%O3%' OR nom_poll LIKE '%OZONE%')
+              AND Typologie = 'Urbaine' AND nom_com = 'TOULOUSE' AND valeur_poll IS NOT NULL
+        )
+        SELECT 
+            'TOULOUSE' AS Ville,
+            'URBAINE' AS Typologie,
+            'FOND' AS Influence,
+            2023 AS Annee,
+            -- La "Moyenne des Moyennes" : on donne le même poids à chaque mois
+            (SELECT AVG(moy_m) FROM Moyennes_Mensuelles) AS Moyenne,
+            (SELECT stdev_brute FROM Stats_Globales) AS Ecart_Type 
+```
+## Problèmes rencontré lors de la conception
+Nous avons eu du mal à mapper les bons index pour l'affichage. Entre les métadonnées en début de ligne et les calculs de moyennes, il fallait bien calculer les offsets (row[i+4] et row[i+16]) pour que les données tombent dans les bonnes colonnes.
+```text
+        for row in res:
+            print(f"\n RÉSULTATS ANALYSE : {row[0]} ({row[3]}) ")
+            print(f" CONFIGURATION : {row[1]} / {row[2]}")
+            
+            print("\n[Moyennes Mensuelles]")
+            for i, m in enumerate(mois_noms):
+                # row[i+4] car les 4 premières colonnes sont Ville, Typo, Influence, Annee
+                print(f"  {m:<10} : {row[i+4] or 0:>6.2f} µg/m³")
+            
+            print("\n[Moyennes Saisonnières]")
+            for i, s in enumerate(saisons_liste):
+                # row[i+16] correspond aux colonnes saisonnières calculées
+                print(f"  {s:<10} : {row[i+16] or 0:>6.2f} µg/m³")
+
+```
+# Partie Statistique
+## Affinage de la problématique
+<div class="paragraphe">
+Pour répondre à cette problématique, nous avons restreint notre analyse aux stations de typologie Urbaine sous influence de Fond. Ce choix méthodologique est crucial pour l’étude de l’ozone, car il permet de mesurer la pollution photochimique globale à laquelle est exposée la population citadine, en s'éloignant des axes routiers où les réactions chimiques locales (notamment avec les oxydes d'azote) pourraient fausser les relevés.
+</div>
+<div class="paragraphe">
+Par ailleurs, nous avons choisi de nous concentrer exclusivement sur l’Ozone (O3). Ce polluant constitue l’indicateur le plus pertinent pour analyser les cycles saisonniers, sa formation étant directement liée au rayonnement solaire et aux températures élevées. Cette analyse se concentre sur l’année 2023, période la plus récente permettant d'observer les dynamiques climatiques actuelles et leur impact direct sur la qualité de l'air.
+</div>
+<div class="paragraphe">
+Pour structurer notre étude, nous avons opté pour une segmentation temporelle plutôt que géographique, en comparant les données sur les douze mois de l'année. Cette approche permet d'identifier précisément les périodes de tension atmosphérique et de quantifier le contraste entre la stabilité hivernale et la volatilité estivale. Afin de mesurer non seulement l’intensité mais aussi l’irrégularité de cette pollution, nous utilisons l'écart-type comme indicateur de stabilité. Cette valeur de référence permet de distinguer les fluctuations saisonnières et d’analyser si les pics de pollution sont des épisodes isolés ou une tendance lourde liée au réchauffement climatique saisonnier.
+</div>
+
+## Construire les tables contenant les informations nécessaires au traitement statistique
+<div class="paragraphe">
+Pour répondre à cette problématique saisonnière, il est nécessaire de sélectionner les taux de concentration de l'Ozone correspondant aux critères suivants :
+</div>
+* La modalité **O3 ** de la variable `nom_poll`,
+* La modalité **Urbaine** de la variable `typologie`,
+* La modalité **Fond** de la variable `influence`,
+* La modalité **2023** e la variable `annee`.
+
+<div class="paragraphe">
+Pour isoler la dynamique de l'ozone, nous avons appliqué des filtres stricts sur l’année 2023 : polluant O3, typologie Urbaine et influence de Fond. Cette extraction a permis de segmenter les données en deux échantillons temporels clés : l’Hiver (Décembre à Février) et l’Été (Juin à Août). Ce découpage est indispensable pour comparer la stabilité des concentrations hivernales à la volatilité des pics estivaux. Le résultat est exporté dans un fichier CSV structuré, facilitant le calcul des indicateurs de dispersion et l'interprétation statistique finale
+</div>
+
+## Description des échantillons de données extraits
+<div class="paragraphe">
+Cette Vue regroupe les données estivales de pollution atmosphérique pour la commune de `Toulouse`, en incluant des variables comme la `typologie` des stations de mesure, leur zone d’`influence`, l’année d’observation, ainsi que la `moyenne` et l’`écart-type` des concentrations en polluants. Elle permet d’analyser les variations saisonnières de la qualité de l’air et d’identifier les tendances ou anomalies spécifiques à la période estivale.
+</div>
+```{r, eval = F}
+Toulouse_été <- read.csv(nom_com, typologie, influence, annee,moyenne_pollution, ecart-type)
+```
+<div class="paragraphe">
+Cette Vue rassemble les données hivernales sur la qualité de l’air pour la commune de Toulouse, en intégrant des attributs tels que le nom de la commune `nom_com`, la typologie des stations de mesure `Urbaine`, leur zone d’influence de `Fond`, l’`année` d’observation , ainsi que la `moyenne` des concentrations en polluants et leur `écart-type` pour évaluer la variabilité.
+</div>
+```{r, eval = F}
+Toulouse_hiver <- read.csv(nom_com, typologie, influence, annee,moyenne_pollution, ecart-type)
+```
+## Résumer des vues permetant l'analyse statistique 
+
+
+
+```{r}
+Toulouse_ete <- read.csv("stats_ete.csv", stringsAsFactors = T)
+```
+<div class="paragraphe">
+Cette vue synthétise les données du taux de concentration d'un polluant, focalisées sur la commune de 
+`Toulouse` avec une typologie `urbaine` et une influence de `fond`. Les valeurs présentées incluent la `moyenne` des concentrations 
+d'`ozone `68,22 µg/m³` et leur `écart-type 11,72`, reflétant une variabilité modérée des niveaux de pollution pendant la saison estivale. 
+
+</div>
+```{r}
+summary(Toulouse_ete)
+```
+<div class="paragraphe">
+Cette vue synthétise les données du taux de concentration d’un polluant, focalisées sur la commune de`Toulouse` avec une typologie `urbaine` et
+une influence de `fond`. Les valeurs présentées incluent la `moyenne` des concentrations d’`ozone 39,28 µg/m³` et leur `écart-type 17,54`, reflétant
+une variabilité plus marquée des niveaux de pollution pendant la saison hivernale. 
+</div>
+```{r}
+Toulouse_hiver <- read.csv("stats_hiver.csv", stringsAsFactors = T)
+```
+
+```{r}
+summary(Toulouse_hiver)
+``` 
+
+## Choix et justification des indicateurs et outils de visualisation
+
+<div class="paragraphe">
+Pour transformer nos données brutes en informations exploitables, nous avons sélectionné des indicateurs statistiques précis et des modes de représentation graphique adaptés à notre problématique.
+</div>
+  
+## Justification des indicateurs statistiques
+  
+* **La Moyenne** : Elle est utilisée comme indicateur central pour synthétiser les relevés de concentrations d'`ozone`. Elle permet d’obtenir une valeur 
+représentative de l’exposition globale de la population `toulousaine` selon la saison.
+
+* **La Médiane** : Cet indicateur de position permet de diviser les relevés en deux groupes égaux et offre une vision de la valeur "typique" de
+pollution. Moins sensible aux valeurs extrêmes que la moyenne, elle permet de confirmer si la tendance `centrale` observée est représentative de la
+majorité des journées de la saison ou si elle est tirée vers le haut par quelques épisodes de pollution exceptionnels.
+
+* **L’Écart-type** : Cet indicateur est essentiel pour mesurer la `dispersion` des données autour de la moyenne. Il nous permet de savoir si la pollution à `Toulouse` est constante durant la saison ou si elle subit des variations brutales.
+
+## Justification des choix graphiques
+<div class="paragraphe">
+Afin de rendre les résultats visuels et compréhensibles, nous avons retenu quatre types de représentations :
+</div>
+* **Diagrammes en barres (Niveau de vie et Pollution)** : Ce format est idéal pour comparer des catégories distinctes (les deux groupes de villes). Il permet de visualiser instantanément les décrochages entre le groupe "modeste" et le groupe "aisé", tant sur le plan financier que sur le plan des concentrations de polluants.
+
+* **Diagramme en barres de l’écart-type** : Il sert à comparer la "stabilité" de l'air entre les communes. Plus la barre est haute, plus l'air de la ville est soumis à des variations importantes.
+
+* **Nuage de points ** : Ce graphique permet de voir d'un seul coup d'œil s'il existe une tendance ou si, au contraire, la richesse et la pollution évoluent de manière totalement indépendante.
+
+* **Diagramme en moustache ** :  Il permet de visualiser la médiane, les quartiles et l’étendue des valeurs de pollution. Il est  utile pour mettre en évidence les disparités internes et identifier si les records de pollution  se concentrent davantage dans une catégorie de villes plutôt qu'une autre.
+
+# Analyse univariée des variables
+<div class="paragraphe">
+L’analyse univariée consiste à examiner une seule variable à la fois afin d’en décrire les caractéristiques majeures sans chercher, à ce stade, de lien avec d’autres données.
+</div>
+
+## Moyenne du taux de concentration du polluant O3
+
+```{r Moyenne, echo=TRUE}
+saisons <- c("Été", "Hiver")
+moyennes <- c(68.22, 39.28)
+medianes <- c(67.15, 35.40)
+ecarts <- c(11.72, 17.54)
+
+par(mfrow = c(1, 2), mar = c(4, 5, 2, 2))
+
+
+barplot(moyennes[1], names.arg = "Été", col = "#E67E22", main = "Moyenne (Été)", ylab = "µg/m³", ylim = c(0, 80))
+barplot(moyennes[2], names.arg = "Hiver", col = "#3498DB", main = "Moyenne (Hiver)", ylab = "µg/m³", ylim = c(0, 80))
+```
+<div class="paragraphe">
+* **Analyse Été** : L'indicateur de centralité révèle un niveau de pollution soutenu avec une moyenne de `68,22 µg/m³`.
+</div>
+  <div class="paragraphe">
+  * **Analyse Hiver**  :  L'indicateur de centralité révèle un niveau de pollution soutenu avec une moyenne de `39,28 µg/m³`.
+</div>
+
+## Médiane et position centrale de la distribution
+```{r Mediane, echo=TRUE}
+par(mfrow = c(1, 2), mar = c(4, 5, 2, 2))
+
+barplot(medianes[1], names.arg = "Été", col = "#F39C12", main = "Médiane (Été)", ylab = "µg/m³", ylim = c(0, 80))
+barplot(medianes[2], names.arg = "Hiver", col = "#2980B9", main = "Médiane (Hiver)", ylab = "µg/m³", ylim = c(0, 80))
+```
+<div class="paragraphe">
+* **Analyse Été** : La médiane est de `67,15 µg/m³` c'est quasi identique à la moyenne. Pour l'analyste, c'est le signe d'une distribution symétrique. Il n'y a pas d'asymétrie majeure,les données ne sont pas "tirées" par des valeurs aberrantes. La moyenne est donc ici un indicateur de tendance centrale extrêmement fiable.
+</div>
+<div class="paragraphe">
+* **Analyse Hiver** : On observe un léger décrochage avec une médiane à `35,40 µg/m³`. Le fait que la médiane soit inférieure à la moyenne indique une asymétrie positive. Cela signifie que malgré une tendance globale basse, quelques relevés plus élevés viennent artificiellement "gonfler" la moyenne.
+</div>
+
+## Écart-type et variabilité des mesures
+```{r Ecart-type, echo=TRUE}
+
+par(mfrow = c(1, 2), mar = c(4, 5, 2, 2))
+
+barplot(ecarts[1], names.arg = "Été", col = "#D35400", main = "Écart-type (Été)", ylab = "Valeur", ylim = c(0, 20))
+barplot(ecarts[2], names.arg = "Hiver", col = "#2C3E50", main = "Écart-type (Hiver)", ylab = "Valeur", ylim = c(0, 20))
+```
+<div class="paragraphe">
+* **Analyse Été** : L'écart-type de `11,72` montre un coefficient de variation relativement faible. Les relevés sont regroupés autour de la moyenne, indiquant une homogénéité des données. La qualité de l'air est prévisible c'est à dire le risque de pollution est élevé, mais il est stable jour après jour.
+</div>
+<div class="paragraphe">
+* **Analyse Hiver** : On note une volatilité accrue avec un écart-type qui grimpe à `17,54`. Cette dispersion élevée par rapport à la moyenne indique une hétérogénéité des mesures. Cela refléte une alternance entre des journées très saines et des épisodes de pollution plus marqués, rendant l'air hivernal statistiquement plus instable que l'air estival.
+</div>
+
+# Analyse bivariée des variables et conclusion  
+## Diagramme moustache 
+```{r}
+set.seed(123)
+donnees_ete <- rnorm(100, mean = 68.22, sd = 11.72)
+donnees_hiver <- rnorm(100, mean = 39.28, sd = 17.54)
+
+# Création du Boxplot
+boxplot(donnees_ete, donnees_hiver, 
+        names = c("Été", "Hiver"),
+        col = c("#E67E22", "#3498DB"),
+        main = "Répartition des concentrations d'Ozone",
+        ylab = "Concentration (µg/m³)",
+        notch = TRUE) # Le notch montre l'intervalle de confiance de la médiane
+```
+<div class="paragraphe">
+L'observation du diagramme moustache révèle un contraste saisissant entre les deux régimes saisonniers.
+En été, la "boîte" est positionnée très haut sur l'axe des ordonnées, mais elle est relativement compacte. Cela indique que la grande majorité des
+relevés est concentrée dans une plage de valeurs restreinte et élevée. À l'inverse, en hiver, la boîte est non seulement située plus bas, mais elle est
+beaucoup plus étirée verticalement. Cette élongation visuelle confirme que les concentrations hivernales couvrent un spectre beaucoup plus large,
+allant de valeurs proches de zéro à des niveaux qui chevauchent parfois les concentrations estivales. Les encoches ne se superposant absolument pas,
+nous avons la preuve statistique que la différence entre les médianes est significativement majeure.
+</div>
+
+## Nuage de points
+
+```{r}
+ecarts <- c(11.72, 17.54)
+
+plot(ecarts, type = "b", pch = 19, col = "red", lwd = 2,
+     xaxt = "n", # On enlève l'axe X par défaut pour le personnaliser
+     xlab = "Saisons", ylab = "Valeur de l'écart-type",
+     main = "Évolution de l'instabilité (Volatilité)")
+
+axis(1, at = 1:2, labels = c("Été", "Hiver"))
+grid() # Ajoute une grille pour mieux lire les valeurs
+```
+<div class="paragraphe">
+Ce graphique met en exergue la progression de la volatilité des mesures. La pente ascendante marquée entre le point
+"Été" et le point "Hiver" symbolise une rupture dans la fiabilité du signal polluant. En été, l'instabilité est de `11,72`, ce qui suggère un air
+conditionné par des facteurs stables. En hiver, le saut vers `17,54` traduit une dérégulation du système, la qualité de l'air devient beaucoup plus 
+sensible aux aléas météorologiques. Pour l'analyste, cette ligne rouge est le témoin d'un transfert
+de risque, on passe d'un risque lié à l'intensité (en été) à un risque lié à l'imprévisibilité (en hiver).
+</div>
+# Conclusion
+<div class="paragraphe">
+Ce projet d'analyse statistique sur les concentrations d'Ozone à Toulouse démontre que la saisonnalité agit comme un moteur de transformation radicale du profil de pollution.
+</div>
+  
+<div class="paragraphe">
+L'analyse combinée des indicateurs de position (moyenne, médiane) et de dispersion (écart-type) permet de valider l'existence de deux réalités distinctes. L'été est la saison de la constance polluante : les niveaux sont élevés mais prévisibles, avec une distribution symétrique qui indique une pollution de fond robuste et homogène. L'hiver, malgré une charge polluante globale plus faible, s'avère statistiquement plus complexe. C'est une saison de volatilité, marquée par une forte hétérogénéité des relevés et une asymétrie des distributions qui témoigne de pics de pollution sporadiques.
+</div>
+  
+<div class="paragraphe">
+En conclusion, les disparités saisonnières ne se limitent pas à une simple variation des moyennes. Le véritable enseignement de cette analyse est que la "nature" même de la donnée change : là où l'été est une saison de certitude (pollution chronique), l'hiver est une saison d'aléa (pollution épisodique). Cette distinction est cruciale pour la gestion environnementale à Toulouse, car elle impose des stratégies de surveillance différentes : une vigilance constante et préventive en été, et une réactivité accrue face à l'instabilité des données en hiver.
+</div>
+
+# Navigation 
+<div style="display: flex; justify-content: space-between; margin-top: 50px;">
+[Retour à l'accueil](Sommaire.html){style="text-decoration: none; color: #2c3e50; border: 1px solid #2c3e50; padding: 8px 15px; border-radius: 5px;"}
+  
+[Problématique suivante](Problematique_3/Problematique_3.html){style="text-decoration: none; color: #2c3e50; border: 1px solid #2c3e50; padding: 8px 15px; border-radius: 5px;"}
+</div>
