@@ -9,10 +9,8 @@
 
 | Étudiant | Participation |
 |---|---|
-| Aït Mahammed Salim | 30 % |
-| Dahouede Coomi | 20 % |
-| Ganda TE GremBOBO Eric | 20 % |
-| Roumagnac Hugo | 30 % |
+| Aït Mahammed Salim | 50 % |
+| Roumagnac Hugo | 50 % |
 
 ---
 
